@@ -28,8 +28,8 @@ dependencies {
     compile files('libs/poi.jar')
 }
 
-def siteUrl = 'https://github.com/androidmads/UpdateHandler'      // Homepage URL of the library
-def gitUrl = 'https://github.com/androidmads/UpdateHandler.git'   // Git URL
+def siteUrl = 'https://github.com/androidmads/SQLite2XL'      // Homepage URL of the library
+def gitUrl = 'https://github.com/androidmads/SQLite2XL.git'   // Git URL
 
 install {
     repositories.mavenInstaller {

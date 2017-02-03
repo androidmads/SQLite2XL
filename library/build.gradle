@@ -78,7 +78,7 @@ bintray {
         name = 'com.ajts.androidmads.SQLite2Excel'
 
         version {
-            name = '1.0.3'
+            name = '1.0.0'
             desc = 'Library to Convert SQlite Data to Excel'
             released = new Date()
             vcsTag = '1.0.0'

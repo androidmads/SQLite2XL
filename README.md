@@ -48,7 +48,7 @@ sqliteToExcel.startExportSingleTable("table1", "table1.xls", new ExportListener(
 
 #####This code snippet is used to Export a every table in a database to Excel Sheet
 ```java
-ste.startExportAllTables("helloworlddb.xls", new ExportListener() {
+sqliteToExcel.startExportAllTables("helloworlddb.xls", new ExportListener() {
 			
 	@Override
 	public void onStart() {

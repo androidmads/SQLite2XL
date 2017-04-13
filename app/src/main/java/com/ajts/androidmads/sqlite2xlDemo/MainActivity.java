@@ -1,97 +1,72 @@
 package com.ajts.androidmads.sqlite2xlDemo;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
-
-import com.ajts.androidmads.library.SQLiteToExcel;
-
-import java.io.File;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    EditText edtUser;
-    Button btnSaveUser, btnExport;
-    ListView lvUsers;
-    ArrayAdapter lvUserAdapter;
-    List<String> usersList;
-
-    DBHelper dbHelper;
-    DBQueries dbQueries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        dbHelper = new DBHelper(getApplicationContext());
-        dbQueries = new DBQueries(getApplicationContext());
-
-        edtUser = (EditText) findViewById(R.id.edt_user);
-        btnSaveUser = (Button) findViewById(R.id.btn_save_user);
-        btnExport = (Button) findViewById(R.id.btn_export);
-
-        lvUsers = (ListView) findViewById(R.id.lv_users);
-        dbQueries.open();
-        usersList = dbQueries.readUsers();
-        lvUserAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, usersList);
-        lvUsers.setAdapter(lvUserAdapter);
-        dbQueries.close();
-
-        btnSaveUser.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnSQL2XL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Users users = new Users();
-                if (edtUser.getText().toString().length() > 0) {
-                    dbQueries.open();
-                    users.setContactPersonName(edtUser.getText().toString());
-                    dbQueries.insertUser(users);
-                    usersList = dbQueries.readUsers();
-                    lvUserAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, android.R.id.text1, usersList);
-                    lvUsers.setAdapter(lvUserAdapter);
-                    dbQueries.close();
-                } else {
-                    edtUser.setError("Enter Name");
-                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED)
+                        startActivity(new Intent(getApplicationContext(), SQLite2ExcelActivity.class));
+                    else
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                else
+                    startActivity(new Intent(getApplicationContext(), SQLite2ExcelActivity.class));
             }
         });
 
-        btnExport.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnXL2SQL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String directory_path = Environment.getExternalStorageDirectory().getPath() + "/Backup/";
-                File file = new File(directory_path);
-                if (!file.exists()) {
-                    file.mkdirs();
-                }
-                // Export SQLite DB as EXCEL FILE
-                SQLiteToExcel sqliteToExcel = new SQLiteToExcel(getApplicationContext(), DBHelper.DB_NAME, directory_path);
-                sqliteToExcel.startExportAllTables("users.xls", new SQLiteToExcel.ExportListener() {
-                    @Override
-                    public void onStart() {
-                    }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED)
+                        startActivity(new Intent(getApplicationContext(), Excel2SQLiteActivity.class));
+                    else
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                else
+                    startActivity(new Intent(getApplicationContext(), Excel2SQLiteActivity.class));
 
-                    @Override
-                    public void onComplete() {
-                        Toast.makeText(getApplicationContext(), "Successfully Exported", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError() {
-                    }
-                });
             }
         });
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.github){
+            String url = "https://github.com/androidmads/SQLite2XL/";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        }
+        return true;
+    }
 }

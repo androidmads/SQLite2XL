@@ -3,15 +3,15 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.ajts.androidmads.SQLite2Excel'
-version = '1.0.0'
+version = '1.0.1'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -30,6 +30,9 @@ dependencies {
 
 def siteUrl = 'https://github.com/androidmads/SQLite2XL'      // Homepage URL of the library
 def gitUrl = 'https://github.com/androidmads/SQLite2XL.git'   // Git URL
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 install {
     repositories.mavenInstaller {
@@ -51,9 +54,9 @@ install {
                 }
                 developers {
                     developer {
-                        id 'androidmads'
-                        name 'mushtaq'
-                        email 'mushtaqat3gb@gmail.com'
+                        id properties.getProperty("library.id")
+                        name properties.getProperty("library.name")
+                        email properties.getProperty("library.mail")
                     }
                 }
                 scm {
@@ -65,10 +68,6 @@ install {
         }
     }
 }
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
@@ -78,10 +77,10 @@ bintray {
         name = 'com.ajts.androidmads.SQLite2Excel'
 
         version {
-            name = '1.0.0'
+            name = '1.0.1'
             desc = 'Library to Convert SQlite Data to Excel'
             released = new Date()
-            vcsTag = '1.0.0'
+            vcsTag = '1.0.1'
         }
 
         licenses = ['Apache-2.0']

@@ -5,9 +5,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
+import android.os.Looper;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFPatriarch;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -15,30 +17,24 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Created by liyu on 2015-9-8
+ */
 public class SQLiteToExcel {
+
+    private static Handler handler = new Handler(Looper.getMainLooper());
 
     private Context mContext;
     private SQLiteDatabase database;
     private String mDbName;
-    private ExportListener mListener;
     private String mExportPath;
-
-    private final static int MESSAGE_START = 0;
-    private final static int MESSAGE_COMPLETE = 1;
-    private final static int MESSAGE_ERROR = 2;
+    private HSSFWorkbook workbook;
 
     public SQLiteToExcel(Context context, String dbName) {
-        mContext = context;
-        mDbName = dbName;
-        mExportPath = Environment.getExternalStorageDirectory().toString() + File.separator;
-        try {
-            database = SQLiteDatabase.openOrCreateDatabase(mContext.getDatabasePath(mDbName).getAbsolutePath(), null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this(context, dbName, Environment.getExternalStorageDirectory().toString() + File.separator);
     }
 
     public SQLiteToExcel(Context context, String dbName, String exportPath) {
@@ -72,95 +68,68 @@ public class SQLiteToExcel {
         return columns;
     }
 
-    private void exportItems(String table, String fileName) {
-        mHandler.sendEmptyMessage(MESSAGE_START);
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet(table);
-        createSheet(table, sheet);
-        FileOutputStream fos = null;
-        try {
-            File file = new File(mExportPath, fileName);
-            fos = new FileOutputStream(file);
-            workbook.write(fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mHandler.sendEmptyMessage(MESSAGE_ERROR);
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.flush();
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    mHandler.sendEmptyMessage(MESSAGE_ERROR);
-                }
-            }
-        }
-        try {
-            workbook.close();
-            mHandler.sendEmptyMessage(MESSAGE_COMPLETE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            mHandler.sendEmptyMessage(MESSAGE_ERROR);
-        }
-    }
-
-    private void exportAllItems(String fileName) {
-        mHandler.sendEmptyMessage(MESSAGE_START);
-        ArrayList<String> tables = getAllTables();
-        HSSFWorkbook workbook = new HSSFWorkbook();
+    private void exportTables(List<String> tables, final String fileName) throws Exception {
+        workbook = new HSSFWorkbook();
         for (int i = 0; i < tables.size(); i++) {
-            if(!tables.get(i).equals("android_metadata")) {
+            if (!tables.get(i).equals("android_metadata")) {
                 HSSFSheet sheet = workbook.createSheet(tables.get(i));
                 createSheet(tables.get(i), sheet);
             }
         }
-        FileOutputStream fos = null;
-        try {
-            File file = new File(mExportPath, fileName);
-            fos = new FileOutputStream(file);
-            workbook.write(fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mHandler.sendEmptyMessage(MESSAGE_ERROR);
-        } finally {
-            if (fos != null) {
+        File file = new File(mExportPath, fileName);
+        FileOutputStream fos = new FileOutputStream(file);
+        workbook.write(fos);
+        fos.flush();
+        fos.close();
+        workbook.close();
+        database.close();
+    }
+
+    public void exportSingleTable(final String table, final String fileName, ExportListener listener) {
+        List<String> tables = new ArrayList<>();
+        tables.add(table);
+        startExportTables(tables, fileName, listener);
+    }
+
+    public void exportSpecificTables(final ArrayList<String> tables, String fileName, ExportListener listener) {
+        startExportTables(tables, fileName, listener);
+    }
+
+    public void exportAllTables(final String fileName, ExportListener listener) {
+        ArrayList<String> tables = getAllTables();
+        startExportTables(tables, fileName, listener);
+    }
+
+    public void startExportTables(final List<String> tables, final String fileName, final ExportListener listener) {
+        if (listener != null) {
+            listener.onStart();
+        }
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
                 try {
-                    fos.flush();
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    mHandler.sendEmptyMessage(MESSAGE_ERROR);
+                    exportTables(tables, fileName);
+                    if (listener != null) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listener.onCompleted(mExportPath + fileName);
+                            }
+                        });
+                    }
+                } catch (final Exception e) {
+                    if (database != null && database.isOpen()) {
+                        database.close();
+                    }
+                    if (listener != null)
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listener.onError(e);
+                            }
+                        });
                 }
-            }
-        }
-        try {
-            workbook.close();
-            mHandler.sendEmptyMessage(MESSAGE_COMPLETE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            mHandler.sendEmptyMessage(MESSAGE_ERROR);
-        }
-    }
-
-    public void startExportSingleTable(final String table, final String fileName, ExportListener listener) {
-        mListener = listener;
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                exportItems(table, fileName);
-            }
-        }).start();
-    }
-
-    public void startExportAllTables(final String fileName, ExportListener listener) {
-        mListener = listener;
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                exportAllItems(fileName);
             }
         }).start();
     }
@@ -176,6 +145,7 @@ public class SQLiteToExcel {
     }
 
     private void insertItemToSheet(String table, HSSFSheet sheet, ArrayList<String> columns) {
+        HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
         Cursor cursor = database.rawQuery("select * from " + table, null);
         cursor.moveToFirst();
         int n = 1;
@@ -183,7 +153,13 @@ public class SQLiteToExcel {
             HSSFRow rowA = sheet.createRow(n);
             for (int j = 0; j < columns.size(); j++) {
                 HSSFCell cellA = rowA.createCell(j);
-                cellA.setCellValue(new HSSFRichTextString(cursor.getString(j)));
+                if (cursor.getType(j) == Cursor.FIELD_TYPE_BLOB) {
+                    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) j, n, (short) (j + 1), n + 1);
+                    anchor.setAnchorType(3);
+                    patriarch.createPicture(anchor, workbook.addPicture(cursor.getBlob(j), HSSFWorkbook.PICTURE_TYPE_JPEG));
+                } else {
+                    cellA.setCellValue(new HSSFRichTextString(cursor.getString(j)));
+                }
             }
             n++;
             cursor.moveToNext();
@@ -194,27 +170,9 @@ public class SQLiteToExcel {
     public interface ExportListener {
         void onStart();
 
-        void onComplete();
+        void onCompleted(String filePath);
 
-        void onError();
+        void onError(Exception e);
     }
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            int msgId = msg.what;
-            switch (msgId) {
-                case MESSAGE_START:
-                    mListener.onStart();
-                    break;
-                case MESSAGE_COMPLETE:
-                    mListener.onComplete();
-                    break;
-                case MESSAGE_ERROR:
-                    mListener.onError();
-                    break;
-            }
-        }
-    };
 }

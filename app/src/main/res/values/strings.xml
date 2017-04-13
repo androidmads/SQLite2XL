@@ -3,4 +3,12 @@
     <string name="save">Save</string>
     <string name="hint_enter_name">Enter Name</string>
     <string name="export">Export</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="sqlite_2_excel">SQLite 2 Excel</string>
+    <string name="excel_2_sqlite">Excel 2 SQLite</string>
+    <string name="import_">Import</string>
+    <string name="pick">Pick</string>
+    <string name="file_path">File Path</string>
+    <string name="hint_enter_phone_number">Enter Phone Number</string>
+    <string name="github">Github</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.ajts.androidmads.sqlite2xlDemo;
+package com.ajts.androidmads.sqlite2xlDemo.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,12 +7,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.util.ArrayList;
+import com.ajts.androidmads.sqlite2xlDemo.model.Users;
 
-import static com.ajts.androidmads.sqlite2xlDemo.DBConstants.CONTACT_ID;
-import static com.ajts.androidmads.sqlite2xlDemo.DBConstants.CONTACT_PERSON_NAME;
-import static com.ajts.androidmads.sqlite2xlDemo.DBConstants.SELECT_QUERY;
-import static com.ajts.androidmads.sqlite2xlDemo.DBConstants.USER_TABLE;
+import java.util.ArrayList;
 
 public class DBQueries {
 
@@ -37,23 +34,26 @@ public class DBQueries {
     // Users
     public boolean insertUser(Users users) {
         ContentValues values = new ContentValues();
-        values.put(CONTACT_PERSON_NAME, users.getContactPersonName());
-        return database.insert(USER_TABLE, null, values) > -1;
+        values.put(DBConstants.CONTACT_PERSON_NAME, users.getContactPersonName());
+        values.put(DBConstants.CONTACT_NO, users.getContactNumber());
+        return database.insert(DBConstants.USER_TABLE, null, values) > -1;
     }
 
-    public ArrayList<String> readUsers() {
-        ArrayList<String> list = new ArrayList<>();
+    public ArrayList<Users> readUsers() {
+        ArrayList<Users> list = new ArrayList<>();
         try {
             Cursor cursor;
             database = dbHelper.getReadableDatabase();
-            cursor = database.rawQuery(SELECT_QUERY, null);
+            cursor = database.rawQuery(DBConstants.SELECT_QUERY, null);
             list.clear();
             if (cursor.getCount() > 0) {
                 if (cursor.moveToFirst()) {
                     do {
-                        String contactId = cursor.getString(cursor.getColumnIndex(CONTACT_ID));
-                        String conPerson = cursor.getString(cursor.getColumnIndex(CONTACT_PERSON_NAME));
-                        list.add(conPerson);
+                        String contactId = cursor.getString(cursor.getColumnIndex(DBConstants.CONTACT_ID));
+                        String conPerson = cursor.getString(cursor.getColumnIndex(DBConstants.CONTACT_PERSON_NAME));
+                        String conNo = cursor.getString(cursor.getColumnIndex(DBConstants.CONTACT_NO));
+                        Users users = new Users(contactId,conPerson,conNo);
+                        list.add(users);
                     } while (cursor.moveToNext());
                 }
             }

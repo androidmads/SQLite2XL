@@ -1,11 +1,8 @@
-package com.ajts.androidmads.sqlite2xlDemo;
+package com.ajts.androidmads.sqlite2xlDemo.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import static com.ajts.androidmads.sqlite2xlDemo.DBConstants.CREATE_USER_TABLE;
-import static com.ajts.androidmads.sqlite2xlDemo.DBConstants.USER_TABLE;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -20,12 +17,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_USER_TABLE);
+        db.execSQL(DBConstants.CREATE_USER_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + DBConstants.USER_TABLE);
     }
 
 }

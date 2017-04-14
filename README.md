@@ -1,8 +1,6 @@
 # SQLiteToExcel
 This is a Light weight Library to Convert SQLite Database to Excel and Convert Excel to SQLite.
 
-[For More Details](https://github.com/androidmads/SQLite2XL/wiki)
-
 ## Featured In
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SQLite%20To%20Excel-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/5221)
 
@@ -128,6 +126,17 @@ excelToSQLite.importFromAsset(directory_path, new ExcelToSQLite.ImportListener()
 	}
 });
 ```
+## Using SQLite2XL
+[Mail](mailto:mushtaqat3gb@gmail.com) me with your Google Play URL and I'll add your app to the list :)
+
+Icon         | App          
+------------ | ------------- 
+<img src="https://lh3.googleusercontent.com/BlBW0j3sSNC8x_SzPIolZ6cdUIUKmM9XNN_m3eZc-ytalqjXZvSMK7fXeu6E8riOmA=w300-rw" width="48" height="48" /> | [Invoicer](https://play.google.com/store/apps/details?id=com.ajts.invoicer&hl=en) | 
+
+Wiki
+---------------------
+Please visit the [wiki](https://github.com/androidmads/SQLite2XL/wiki) for a complete guide on SQLite2XL.
+
 ## License
 <pre>
 MIT License

@@ -46,7 +46,11 @@ public class Excel2SQLiteActivity extends AppCompatActivity {
                     return;
                 }
                 dbQueries.open();
-                ExcelToSQLite excelToSQLite = new ExcelToSQLite(getApplicationContext(), DBHelper.DB_NAME);
+                // Is used to import data from excel without dropping table
+                // ExcelToSQLite excelToSQLite = new ExcelToSQLite(getApplicationContext(), DBHelper.DB_NAME);
+
+                // if you want to add column in excel and import into DB, you must drop the table
+                ExcelToSQLite excelToSQLite = new ExcelToSQLite(getApplicationContext(), DBHelper.DB_NAME, false);
                 // Import EXCEL FILE to SQLite
                 excelToSQLite.importFromFile(directory_path, new ExcelToSQLite.ImportListener() {
                     @Override

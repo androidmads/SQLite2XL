@@ -2,6 +2,7 @@ package com.ajts.androidmads.library;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,10 +26,22 @@ public class ExcelToSQLite {
     private Context mContext;
     private SQLiteDatabase database;
     private String mDbName;
+    private boolean dropTable = false;
 
     public ExcelToSQLite(Context context, String dbName) {
         mContext = context;
         mDbName = dbName;
+        try {
+            database = SQLiteDatabase.openOrCreateDatabase(mContext.getDatabasePath(mDbName).getAbsolutePath(), null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ExcelToSQLite(Context context, String dbName, boolean dropTable) {
+        mContext = context;
+        mDbName = dbName;
+        this.dropTable = dropTable;
         try {
             database = SQLiteDatabase.openOrCreateDatabase(mContext.getDatabasePath(mDbName).getAbsolutePath(), null);
         } catch (Exception e) {
@@ -135,7 +148,22 @@ public class ExcelToSQLite {
             columns.add(rowHeader.getCell(i).getStringCellValue());
         }
         createTableSql.append(")");
+
+        if (dropTable)
+            database.execSQL("DROP TABLE IF EXISTS " + sheet.getSheetName());
+
         database.execSQL(createTableSql.toString());
+
+        for (String column : columns) {
+            Cursor cursor = database.rawQuery("SELECT * FROM " + sheet.getSheetName(), null); // grab cursor for all data
+            int deleteStateColumnIndex = cursor.getColumnIndex(column);  // see if the column is there
+            if (deleteStateColumnIndex < 0) {
+                String type = "TEXT";
+                // missing_column not there - add it
+                database.execSQL("ALTER TABLE " + sheet.getSheetName() + " ADD COLUMN " + column + " " + type + " NULL;");
+            }
+        }
+
         while (rit.hasNext()) {
             Row row = rit.next();
             ContentValues values = new ContentValues();
@@ -146,9 +174,9 @@ public class ExcelToSQLite {
                     values.put(columns.get(n), row.getCell(n).getStringCellValue());
                 }
             }
-            long result = database.insert(sheet.getSheetName(), null, values);
+            long result = database.insertWithOnConflict(sheet.getSheetName(), null, values, SQLiteDatabase.CONFLICT_IGNORE);
             if (result < 0) {
-                throw new RuntimeException("insert value failed!");
+                throw new RuntimeException("Insert value failed!");
             }
         }
     }

@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.ajts.androidmads.SQLite2Excel'
-version = '1.0.1'
+version = '1.0.2'
 
 android {
     compileSdkVersion 25
@@ -24,8 +24,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/poi.jar')
+    compile 'org.apache.poi:poi:3.16'
 }
 
 def siteUrl = 'https://github.com/androidmads/SQLite2XL'      // Homepage URL of the library
@@ -33,6 +32,27 @@ def gitUrl = 'https://github.com/androidmads/SQLite2XL.git'   // Git URL
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = 'com.ajts.androidmads.SQLite2Excel'
+
+        version {
+            name = '1.0.2'
+            desc = 'Library to Convert SQlite Data to Excel'
+            released = new Date()
+            vcsTag = '1.0.2'
+        }
+
+        licenses = ['Apache-2.0']
+        vcsUrl = gitUrl
+        websiteUrl = siteUrl
+    }
+}
 
 install {
     repositories.mavenInstaller {
@@ -68,26 +88,6 @@ install {
         }
     }
 }
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
-    pkg {
-        repo = 'maven'
-        name = 'com.ajts.androidmads.SQLite2Excel'
-
-        version {
-            name = '1.0.1'
-            desc = 'Library to Convert SQlite Data to Excel'
-            released = new Date()
-            vcsTag = '1.0.1'
-        }
-
-        licenses = ['Apache-2.0']
-        vcsUrl = gitUrl
-        websiteUrl = siteUrl
-    }
-}
 
 task generateSourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -108,4 +108,3 @@ artifacts {
     archives generateSourcesJar
     archives generateJavadocsJar
 }
-

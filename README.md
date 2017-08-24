@@ -10,13 +10,16 @@ The sample app in the repository is available on Google Play:
 <a href='https://play.google.com/store/apps/details?id=com.ajts.androidmads.sqlite2xlDemo&utm_source=AndroidMads&utm_campaign=AndroidMads&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 ## Features
+### 1.0.2
+1. Added support to add new column from excel while importing, if the column is not exists.
+### 1.0.1 
 1. Added Functionality to Import Excel into SQLite Database.
 2. Added Functionality to Export Blob into Image.
 3. Added Functionality to Export List of tables specified.
 ## How to Download
 add the following library in your app level gradle file
 ```groovy
-compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.1'
+compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.2'
 ```
 ## How to Use
 #### The steps to use this Library
@@ -88,6 +91,12 @@ The following snippet is used to initialize the library for Importing Excel
 ```java
 ExcelToSQLite excelToSQLite = new ExcelToSQLite(getApplicationContext(), "helloworld.db");
 ```
+or
+To drop table while importing the Excel, use the following
+```java
+ExcelToSQLite excelToSQLite = new ExcelToSQLite(getApplicationContext(), "helloworld.db", true);
+```
+
 ##### The following code is used to Import Excel from Assets
 ```java
 excelToSQLite.importFromAsset("assetFileName.xls", new ExcelToSQLite.ImportListener() {

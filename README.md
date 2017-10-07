@@ -3,7 +3,7 @@ This is a Light weight Library to Convert SQLite Database to Excel and Convert E
 
 ## Featured In
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-SQLite%20To%20Excel-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/5221)
-
+<a href="http://www.methodscount.com/?lib=com.ajts.androidmads.SQLite2Excel%3Alibrary%3A1.0.2"><img src="https://img.shields.io/badge/Methods and size-core: 130 | deps: 22949 | 16 KB-e91e63.svg"/></a>
 ## Sample App
 The sample app in the repository is available on Google Play:
 

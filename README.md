@@ -146,6 +146,9 @@ Wiki
 ---------------------
 Please visit the [wiki](https://github.com/androidmads/SQLite2XL/wiki) for a complete guide on SQLite2XL.
 
+## Quick Solution
+* If you find that the exported excel is not opened, read the following issue
+https://github.com/androidmads/SQLite2XL/issues/7
 ## License
 <pre>
 MIT License

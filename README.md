@@ -135,6 +135,11 @@ excelToSQLite.importFromAsset(directory_path, new ExcelToSQLite.ImportListener()
 	}
 });
 ```
+## Proguard for SQLite2XL
+```
+-dontwarn org.apache.poi.**
+```
+
 ## Using SQLite2XL
 [Mail](mailto:mushtaqat3gb@gmail.com) me with your Google Play URL and I'll add your app to the list :)
 

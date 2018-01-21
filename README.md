@@ -118,7 +118,7 @@ excelToSQLite.importFromAsset("assetFileName.xls", new ExcelToSQLite.ImportListe
 ```
 ##### The following code is used to Import Excel from user directory
 ```java
-excelToSQLite.importFromAsset(directory_path, new ExcelToSQLite.ImportListener() {
+excelToSQLite.importFromFile(directory_path, new ExcelToSQLite.ImportListener() {
 	@Override
 	public void onStart() {
 

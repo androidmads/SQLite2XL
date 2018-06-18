@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.ajts.androidmads.SQLite2Excel'
-version = '1.0.3'
+version = '1.0.4'
 
 android {
     compileSdkVersion 25
@@ -42,10 +42,10 @@ bintray {
         name = 'com.ajts.androidmads.SQLite2Excel'
 
         version {
-            name = '1.0.2'
+            name = '1.0.4'
             desc = 'Library to Convert SQlite Data to Excel'
             released = new Date()
-            vcsTag = '1.0.2'
+            vcsTag = '1.0.4'
         }
 
         licenses = ['Apache-2.0']

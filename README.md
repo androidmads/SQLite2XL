@@ -10,6 +10,8 @@ The sample app in the repository is available on Google Play:
 <a href='https://play.google.com/store/apps/details?id=com.ajts.androidmads.sqlite2xlDemo&utm_source=AndroidMads&utm_campaign=AndroidMads&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' width='150px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 ## Features
+### 1.0.4
+1. Added the ability to provide a custom formatter  to the export.
 ### 1.0.3
 1. Added the ability to exclude columns from the export.
 2. Added `pretty` name mapping to export
@@ -22,7 +24,7 @@ The sample app in the repository is available on Google Play:
 ## How to Download
 add the following library in your app level gradle file
 ```groovy
-compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.3'
+compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.4'
 ```
 ## How to Use
 #### The steps to use this Library
@@ -104,6 +106,29 @@ prettyNameMapping.put("income_date", "Date");
 sqliteToExcel.setPrettyNameMapping(prettyNameMapping);
 ...
 sqliteToExcel.export...
+```
+##### This code snippet shows how to format the value for a column on export (if you want to convert ID's or whatnot to be better displayed)
+```java
+sqliteToExcel.setCustomFormatter(new SQLiteToExcel.ExportCustomFormatter() {
+    @Override
+    public String process(String columnName, String value) {
+        switch(columnName) {
+            case "income_type_id":
+                int v = Integer.parseInt(value);
+                switch(v) {
+                    case 10: 
+                        value = "Sale";
+                        break;
+                    ...
+                    default: 
+                        value = "Unknown";
+                        break;
+                }
+                break;
+        }
+        return value;
+    }
+});
 ```
 ## Import Excel into Database
 The following snippet is used to initialize the library for Importing Excel

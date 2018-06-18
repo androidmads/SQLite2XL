@@ -10,6 +10,9 @@ The sample app in the repository is available on Google Play:
 <a href='https://play.google.com/store/apps/details?id=com.ajts.androidmads.sqlite2xlDemo&utm_source=AndroidMads&utm_campaign=AndroidMads&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' width='150px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 ## Features
+### 1.0.3
+1. Added the ability to exclude columns from the export.
+2. Added `pretty` name mapping to export
 ### 1.0.2
 1. Added support to add new column from excel while importing, if the column is not exists.
 ### 1.0.1 
@@ -19,7 +22,7 @@ The sample app in the repository is available on Google Play:
 ## How to Download
 add the following library in your app level gradle file
 ```groovy
-compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.2'
+compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.3'
 ```
 ## How to Use
 #### The steps to use this Library
@@ -86,6 +89,22 @@ sqliteToExcel.exportAllTables("table1.xls", new SQLiteToExcel.ExportListener() {
      }
 });
 ```
+##### This code snippet shows how to exclude columns from the export (the resulting export file may not be able to be imported)
+```java
+ArrayList<String> columnsToExclude = new ArrayList<String>();
+columnsToExclude.add("income_id");
+sqliteToExcel.setExcludeColumns(columnsToExclude);
+...
+sqliteToExcel.export...
+```
+##### This code snippet shows how to `pretty` names (either sheet names or column names (the resulting export file may not be able to be imported)
+```java
+HashMap<String, String> prettyNameMapping = new HashMap<String, String>();
+prettyNameMapping.put("income_date", "Date");
+sqliteToExcel.setPrettyNameMapping(prettyNameMapping);
+...
+sqliteToExcel.export...
+```
 ## Import Excel into Database
 The following snippet is used to initialize the library for Importing Excel
 ```java
@@ -96,7 +115,6 @@ To drop table while importing the Excel, use the following
 ```java
 ExcelToSQLite excelToSQLite = new ExcelToSQLite(getApplicationContext(), "helloworld.db", true);
 ```
-
 ##### The following code is used to Import Excel from Assets
 ```java
 excelToSQLite.importFromAsset("assetFileName.xls", new ExcelToSQLite.ImportListener() {

@@ -36,6 +36,7 @@ public class SQLiteToExcel {
 
     private List<String> mExcludeColumns = null;
     private HashMap<String, String> mPrettyNameMapping = null;
+    private ExportCustomFormatter mCustomFormatter = null;
 
     public SQLiteToExcel(Context context, String dbName) {
         this(context, dbName, Environment.getExternalStorageDirectory().toString() + File.separator);
@@ -68,6 +69,14 @@ public class SQLiteToExcel {
      */
     public void setPrettyNameMapping(HashMap<String, String> prettyNameMapping) {
         mPrettyNameMapping = prettyNameMapping;
+    }
+
+    /**
+     * Set a the custom formatter for the column value output
+     * @param customFormatter
+     */
+    public void setCustomFormatter(ExportCustomFormatter customFormatter) {
+        mCustomFormatter = customFormatter;
     }
 
     private ArrayList<String> getAllTables() {
@@ -188,7 +197,11 @@ public class SQLiteToExcel {
                         anchor.setAnchorType(3);
                         patriarch.createPicture(anchor, workbook.addPicture(cursor.getBlob(j), HSSFWorkbook.PICTURE_TYPE_JPEG));
                     } else {
-                        cellA.setCellValue(new HSSFRichTextString(cursor.getString(j)));
+                        String value = cursor.getString(j);
+                        if (null != mCustomFormatter) {
+                            value = mCustomFormatter.process(columnName, value);
+                        }
+                        cellA.setCellValue(new HSSFRichTextString(value));
                     }
                     cellIndex++;
                 }
@@ -235,5 +248,12 @@ public class SQLiteToExcel {
         void onCompleted(String filePath);
 
         void onError(Exception e);
+    }
+
+    /**
+     * Interface class for the custom formatter
+     */
+    public interface ExportCustomFormatter {
+        String process(String columnName, String value);
     }
 }

@@ -18,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,6 +34,9 @@ public class SQLiteToExcel {
     private String mExportPath;
     private HSSFWorkbook workbook;
 
+    private List<String> mExcludeColumns = null;
+    private HashMap<String, String> mPrettyNameMapping = null;
+
     public SQLiteToExcel(Context context, String dbName) {
         this(context, dbName, Environment.getExternalStorageDirectory().toString() + File.separator);
     }
@@ -46,6 +50,24 @@ public class SQLiteToExcel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Set the exclude columns list
+     *
+     * @param excludeColumns
+     */
+    public void setExcludeColumns(List<String> excludeColumns) {
+        mExcludeColumns = excludeColumns;
+    }
+
+    /**
+     * Set the pretty name mapping
+     *
+     * @param prettyNameMapping
+     */
+    public void setPrettyNameMapping(HashMap<String, String> prettyNameMapping) {
+        mPrettyNameMapping = prettyNameMapping;
     }
 
     private ArrayList<String> getAllTables() {
@@ -72,7 +94,7 @@ public class SQLiteToExcel {
         workbook = new HSSFWorkbook();
         for (int i = 0; i < tables.size(); i++) {
             if (!tables.get(i).equals("android_metadata")) {
-                HSSFSheet sheet = workbook.createSheet(tables.get(i));
+                HSSFSheet sheet = workbook.createSheet(prettyNameMapping(tables.get(i)));
                 createSheet(tables.get(i), sheet);
             }
         }
@@ -137,9 +159,14 @@ public class SQLiteToExcel {
     private void createSheet(String table, HSSFSheet sheet) {
         HSSFRow rowA = sheet.createRow(0);
         ArrayList<String> columns = getColumns(table);
+        int cellIndex = 0;
         for (int i = 0; i < columns.size(); i++) {
-            HSSFCell cellA = rowA.createCell(i);
-            cellA.setCellValue(new HSSFRichTextString("" + columns.get(i)));
+            String columnName = prettyNameMapping("" + columns.get(i));
+            if (!excludeColumn(columnName)) {
+                HSSFCell cellA = rowA.createCell(cellIndex);
+                cellA.setCellValue(new HSSFRichTextString(columnName));
+                cellIndex++;
+            }
         }
         insertItemToSheet(table, sheet, columns);
     }
@@ -151,20 +178,55 @@ public class SQLiteToExcel {
         int n = 1;
         while (!cursor.isAfterLast()) {
             HSSFRow rowA = sheet.createRow(n);
+            int cellIndex = 0;
             for (int j = 0; j < columns.size(); j++) {
-                HSSFCell cellA = rowA.createCell(j);
-                if (cursor.getType(j) == Cursor.FIELD_TYPE_BLOB) {
-                    HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) j, n, (short) (j + 1), n + 1);
-                    anchor.setAnchorType(3);
-                    patriarch.createPicture(anchor, workbook.addPicture(cursor.getBlob(j), HSSFWorkbook.PICTURE_TYPE_JPEG));
-                } else {
-                    cellA.setCellValue(new HSSFRichTextString(cursor.getString(j)));
+                String columnName = "" + columns.get(j);
+                if (!excludeColumn(columnName)) {
+                    HSSFCell cellA = rowA.createCell(cellIndex);
+                    if (cursor.getType(j) == Cursor.FIELD_TYPE_BLOB) {
+                        HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) cellIndex, n, (short) (cellIndex + 1), n + 1);
+                        anchor.setAnchorType(3);
+                        patriarch.createPicture(anchor, workbook.addPicture(cursor.getBlob(j), HSSFWorkbook.PICTURE_TYPE_JPEG));
+                    } else {
+                        cellA.setCellValue(new HSSFRichTextString(cursor.getString(j)));
+                    }
+                    cellIndex++;
                 }
             }
             n++;
             cursor.moveToNext();
         }
         cursor.close();
+    }
+
+    /**
+     * Do we exclude the specified column from the export
+     *
+     * @param column
+     * @return boolean
+     */
+    private boolean excludeColumn(String column) {
+        boolean exclude = false;
+        if (null != mExcludeColumns) {
+            return mExcludeColumns.contains(column);
+        }
+
+        return exclude;
+    }
+
+    /**
+     * Convert the specified name to a `pretty` name if a mapping exists
+     *
+     * @param name
+     * @return
+     */
+    private String prettyNameMapping(String name) {
+        if (null != mPrettyNameMapping) {
+            if (mPrettyNameMapping.containsKey(name)) {
+                name = mPrettyNameMapping.get(name);
+            }
+        }
+        return name;
     }
 
     public interface ExportListener {
@@ -174,5 +236,4 @@ public class SQLiteToExcel {
 
         void onError(Exception e);
     }
-
 }

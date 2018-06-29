@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SQLite2XL2SQLite.iml" filepath="$PROJECT_DIR$/SQLite2XL2SQLite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SQLite2XL.iml" filepath="$PROJECT_DIR$/SQLite2XL.iml" />
+      <module fileurl="file://F:\AndroidWorks\000\00.AndroidStudioWorks\MyLibrary\SQLite2XL\SQLite2XL2SQLite.iml" filepath="F:\AndroidWorks\000\00.AndroidStudioWorks\MyLibrary\SQLite2XL\SQLite2XL2SQLite.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://F:\AndroidWorks\000\00.AndroidStudioWorks\MyLibrary\SQLite2XL\app\app.iml" filepath="F:\AndroidWorks\000\00.AndroidStudioWorks\MyLibrary\SQLite2XL\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://F:\AndroidWorks\000\00.AndroidStudioWorks\MyLibrary\SQLite2XL\library\library.iml" filepath="F:\AndroidWorks\000\00.AndroidStudioWorks\MyLibrary\SQLite2XL\library\library.iml" />
     </modules>
   </component>
 </project>

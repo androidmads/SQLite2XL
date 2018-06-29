@@ -1,5 +1,6 @@
 package com.ajts.androidmads.sqlite2xlDemo.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -48,7 +49,7 @@ public class CustomAdapter extends BaseAdapter {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View rowView = inflater.inflate(R.layout.list_item, parent, false);
+        @SuppressLint("ViewHolder") View rowView = inflater.inflate(R.layout.list_item, parent, false);
 
         TextView your_first_text_view = (TextView) rowView.findViewById(R.id.listview_firsttextview);
         TextView your_second_text_view = (TextView) rowView.findViewById(R.id.listview_secondtextview);

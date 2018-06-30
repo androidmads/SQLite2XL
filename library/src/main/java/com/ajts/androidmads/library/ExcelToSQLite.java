@@ -6,9 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -132,52 +134,61 @@ public class ExcelToSQLite {
     }
 
     private void createTable(Sheet sheet) {
-        StringBuilder createTableSql = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        createTableSql.append(sheet.getSheetName());
-        createTableSql.append("(");
-        Iterator<Row> rit = sheet.rowIterator();
-        Row rowHeader = rit.next();
-        List<String> columns = new ArrayList<>();
-        for (int i = 0; i < rowHeader.getPhysicalNumberOfCells(); i++) {
-            createTableSql.append(rowHeader.getCell(i).getStringCellValue());
-            if (i == rowHeader.getPhysicalNumberOfCells() - 1) {
-                createTableSql.append(" TEXT");
-            } else {
-                createTableSql.append(" TEXT,");
-            }
-            columns.add(rowHeader.getCell(i).getStringCellValue());
-        }
-        createTableSql.append(")");
-
-        if (dropTable)
-            database.execSQL("DROP TABLE IF EXISTS " + sheet.getSheetName());
-
-        database.execSQL(createTableSql.toString());
-
-        for (String column : columns) {
-            Cursor cursor = database.rawQuery("SELECT * FROM " + sheet.getSheetName(), null); // grab cursor for all data
-            int deleteStateColumnIndex = cursor.getColumnIndex(column);  // see if the column is there
-            if (deleteStateColumnIndex < 0) {
-                String type = "TEXT";
-                // missing_column not there - add it
-                database.execSQL("ALTER TABLE " + sheet.getSheetName() + " ADD COLUMN " + column + " " + type + " NULL;");
-            }
-        }
-
-        while (rit.hasNext()) {
-            Row row = rit.next();
-            ContentValues values = new ContentValues();
-            for (int n = 0; n < row.getPhysicalNumberOfCells(); n++) {
-                if (row.getCell(n).getCellType() == Cell.CELL_TYPE_NUMERIC) {
-                    values.put(columns.get(n), row.getCell(n).getNumericCellValue());
+        Cursor cursor = null;
+        try {
+            StringBuilder createTableSql = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
+            createTableSql.append(sheet.getSheetName());
+            createTableSql.append("(");
+            Iterator<Row> rit = sheet.rowIterator();
+            Row rowHeader = rit.next();
+            List<String> columns = new ArrayList<>();
+            for (int i = 0; i < rowHeader.getPhysicalNumberOfCells(); i++) {
+                createTableSql.append(rowHeader.getCell(i).getStringCellValue());
+                if (i == rowHeader.getPhysicalNumberOfCells() - 1) {
+                    createTableSql.append(" TEXT");
                 } else {
-                    values.put(columns.get(n), row.getCell(n).getStringCellValue());
+                    createTableSql.append(" TEXT,");
+                }
+                columns.add(rowHeader.getCell(i).getStringCellValue());
+            }
+            createTableSql.append(")");
+
+            if (dropTable)
+                database.execSQL("DROP TABLE IF EXISTS " + sheet.getSheetName());
+
+            database.execSQL(createTableSql.toString());
+
+            for (String column : columns) {
+                cursor = database.rawQuery("SELECT * FROM " + sheet.getSheetName(), null);
+                // grab cursor for all data
+                int deleteStateColumnIndex = cursor.getColumnIndex(column);  // see if the column is there
+                if (deleteStateColumnIndex < 0) {
+                    String type = "TEXT";
+                    // missing_column not there - add it
+                    database.execSQL("ALTER TABLE " + sheet.getSheetName()
+                            + " ADD COLUMN " + column + " " + type + " NULL;");
                 }
             }
-            long result = database.insertWithOnConflict(sheet.getSheetName(), null, values, SQLiteDatabase.CONFLICT_IGNORE);
-            if (result < 0) {
-                throw new RuntimeException("Insert value failed!");
+
+            while (rit.hasNext()) {
+                Row row = rit.next();
+                ContentValues values = new ContentValues();
+                for (int n = 0; n < row.getPhysicalNumberOfCells(); n++) {
+                    if (row.getCell(n).getCellTypeEnum() == CellType.NUMERIC) {
+                        values.put(columns.get(n), row.getCell(n).getNumericCellValue());
+                    } else {
+                        values.put(columns.get(n), row.getCell(n).getStringCellValue());
+                    }
+                }
+                long result = database.insertWithOnConflict(sheet.getSheetName(),
+                        null, values, SQLiteDatabase.CONFLICT_IGNORE);
+                if (result < 0) {
+                    throw new RuntimeException("Insert value failed!");
+                }
             }
+        } finally {
+            if (cursor != null)
+                cursor.close();
         }
     }
 

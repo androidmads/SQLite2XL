@@ -10,6 +10,11 @@ The sample app in the repository is available on Google Play:
 <a href='https://play.google.com/store/apps/details?id=com.ajts.androidmads.sqlite2xlDemo&utm_source=AndroidMads&utm_campaign=AndroidMads&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' width='150px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 ## Features
+### 1.0.3
+Added Pull Request from https://github.com/cleathley
+1. Added the ability to provide a custom formatter  to the export.
+2. Added the ability to exclude columns from the export.
+3. Added `pretty` name mapping to export
 ### 1.0.2
 1. Added support to add new column from excel while importing, if the column is not exists.
 ### 1.0.1 
@@ -19,7 +24,7 @@ The sample app in the repository is available on Google Play:
 ## How to Download
 add the following library in your app level gradle file
 ```groovy
-compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.2'
+compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.3'
 ```
 ## How to Use
 #### The steps to use this Library
@@ -84,6 +89,45 @@ sqliteToExcel.exportAllTables("table1.xls", new SQLiteToExcel.ExportListener() {
      public void onError(Exception e) {
 
      }
+});
+```
+##### This code snippet shows how to exclude columns from the export (the resulting export file may not be able to be imported)
+```java
+ArrayList<String> columnsToExclude = new ArrayList<String>();
+columnsToExclude.add("income_id");
+sqliteToExcel.setExcludeColumns(columnsToExclude);
+...
+sqliteToExcel.export...
+```
+##### This code snippet shows how to `pretty` names (either sheet names or column names (the resulting export file may not be able to be imported)
+```java
+HashMap<String, String> prettyNameMapping = new HashMap<String, String>();
+prettyNameMapping.put("income_date", "Date");
+sqliteToExcel.setPrettyNameMapping(prettyNameMapping);
+...
+sqliteToExcel.export...
+```
+##### This code snippet shows how to format the value for a column on export (if you want to convert ID's or whatnot to be better displayed)
+```java
+sqliteToExcel.setCustomFormatter(new SQLiteToExcel.ExportCustomFormatter() {
+    @Override
+    public String process(String columnName, String value) {
+        switch(columnName) {
+            case "income_type_id":
+                int v = Integer.parseInt(value);
+                switch(v) {
+                    case 10:
+                        value = "Sale";
+                        break;
+                    ...
+                    default:
+                        value = "Unknown";
+                        break;
+                }
+                break;
+        }
+        return value;
+    }
 });
 ```
 ## Import Excel into Database

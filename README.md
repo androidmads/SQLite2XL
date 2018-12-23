@@ -24,7 +24,7 @@ Added Pull Request from https://github.com/cleathley
 ## How to Download
 add the following library in your app level gradle file
 ```groovy
-compile 'com.ajts.androidmads.SQLite2Excel:library:1.0.3'
+implementation 'com.ajts.androidmads.SQLite2Excel:library:1.0.4'
 ```
 ## How to Use
 #### The steps to use this Library

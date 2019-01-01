@@ -1,7 +1,8 @@
 package com.ajts.androidmads.sqlite2xlDemo.util;
 
-import android.support.design.widget.Snackbar;
 import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Created by Mushtaq on 14-04-2017.

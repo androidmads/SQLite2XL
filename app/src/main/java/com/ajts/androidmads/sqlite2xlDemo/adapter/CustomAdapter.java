@@ -2,15 +2,10 @@ package com.ajts.androidmads.sqlite2xlDemo.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ajts.androidmads.sqlite2xlDemo.R;
@@ -18,6 +13,8 @@ import com.ajts.androidmads.sqlite2xlDemo.model.Users;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by Mushtaq on 12-04-2017.

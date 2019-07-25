@@ -3,11 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SQLite2XL.iml" filepath="$PROJECT_DIR$/SQLite2XL.iml" />
-      <module fileurl="file://F:\01.MyWorks\AJTS\Library\SQLite2XL\SQLite2XL.iml" filepath="F:\01.MyWorks\AJTS\Library\SQLite2XL\SQLite2XL.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://F:\01.MyWorks\AJTS\Library\SQLite2XL\app\app.iml" filepath="F:\01.MyWorks\AJTS\Library\SQLite2XL\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
-      <module fileurl="file://F:\01.MyWorks\AJTS\Library\SQLite2XL\library\library.iml" filepath="F:\01.MyWorks\AJTS\Library\SQLite2XL\library\library.iml" />
     </modules>
   </component>
 </project>

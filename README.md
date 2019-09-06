@@ -181,7 +181,7 @@ excelToSQLite.importFromFile(directory_path, new ExcelToSQLite.ImportListener() 
 ```
 ## Proguard for SQLite2XL
 ```
--dontwarn org.apache.poi.**
+-keep public class org.apache.poi.** {*;}
 ```
 
 ## Using SQLite2XL

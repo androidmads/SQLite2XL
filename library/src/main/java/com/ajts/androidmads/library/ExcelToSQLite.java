@@ -6,10 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -153,10 +151,11 @@ public class ExcelToSQLite {
             }
             createTableSql.append(")");
 
-            if (dropTable)
+            if (dropTable) {
                 database.execSQL("DROP TABLE IF EXISTS " + sheet.getSheetName());
 
-            database.execSQL(createTableSql.toString());
+                database.execSQL(createTableSql.toString());
+            }
 
             for (String column : columns) {
                 cursor = database.rawQuery("SELECT * FROM " + sheet.getSheetName(), null);

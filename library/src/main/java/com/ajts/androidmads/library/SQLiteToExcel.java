@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.ClientAnchor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,6 +34,10 @@ public class SQLiteToExcel {
     private List<String> mExcludeColumns = null;
     private HashMap<String, String> mPrettyNameMapping = null;
     private ExportCustomFormatter mCustomFormatter = null;
+
+    private static final String[] ignoreThisTables = new String[]{
+            "android_metadata",
+            "sqlite_sequence"};
 
     public SQLiteToExcel(Context context, String dbName) {
         this(context, dbName, Environment.getExternalStorageDirectory().toString() + File.separator);
@@ -67,6 +72,7 @@ public class SQLiteToExcel {
 
     /**
      * Set a the custom formatter for the column value output
+     *
      * @param customFormatter
      */
     public void setCustomFormatter(ExportCustomFormatter customFormatter) {
@@ -96,7 +102,7 @@ public class SQLiteToExcel {
     private void exportTables(List<String> tables, final String fileName) throws Exception {
         workbook = new HSSFWorkbook();
         for (int i = 0; i < tables.size(); i++) {
-            if (!tables.get(i).equals("android_metadata")) {
+            if (!Arrays.asList(ignoreThisTables).contains(tables.get(i))) {
                 HSSFSheet sheet = workbook.createSheet(prettyNameMapping(tables.get(i)));
                 createSheet(tables.get(i), sheet);
             }
